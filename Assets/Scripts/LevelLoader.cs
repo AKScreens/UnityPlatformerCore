@@ -11,7 +11,7 @@ public class LevelLoader : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         playerInZone = false;
-        particleManager = FindObjectOfType< ParticleSysManagement>();
+        particleManager = FindObjectOfType<ParticleSysManagement>();
 	}
 	
 	// Update is called once per frame
@@ -27,7 +27,7 @@ public class LevelLoader : MonoBehaviour {
         if(other.name == "Player")
         {
             playerInZone = true;
-            particleManager.Activate();
+            //particleManager.Activate();
         }
     }
 
@@ -36,7 +36,7 @@ public class LevelLoader : MonoBehaviour {
         if (other.name == "Player")
         {
             playerInZone = false;
-            particleManager.Deactivate();
+            //particleManager.Deactivate();
         }
     }
 }

@@ -3,13 +3,28 @@ using System.Collections;
 
 public class ParticleSysManagement : MonoBehaviour {
 
-    public void Activate()
+    ParticleSystem particles;
+    
+
+    public void Start()
     {
-        gameObject.SetActive(true);
-    }
-    public void Deactivate()
-    {
-        gameObject.SetActive(false);
+        particles = GetComponent<ParticleSystem>();
     }
 
+    public void Update()
+    {
+        //Debug.Log(particles.rateOverTime);
+    } 
+
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Player")
+            particles.Play();
+    }
+
+    public void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.tag == "Player")
+            particles.Stop();
+    } 
 }

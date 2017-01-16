@@ -8,11 +8,10 @@ public class PlayerController2d : MonoBehaviour
     public int jumpHeight;
     public int dashForceHorizontal;
     public int dashForceVertical;
-    public int dashDistance;
+    public float dashDistance;
     private int faceRight;
     public float defaultGravity;
     private float dashStallTime;
-    private float dashFallTime;
     //private float dashIntervalTime;
     //private float timeSinceDash;
 
@@ -35,8 +34,7 @@ public class PlayerController2d : MonoBehaviour
     {
         rb2D = GetComponent<Rigidbody2D>();
         //bx2D = GetComponent<BoxCollider2D>();
-        dashStallTime = 0.2f;
-        dashFallTime = 0.2f;
+        dashStallTime = 0f;
         //dashIntervalTime = 0.1f;
     }
 
@@ -48,6 +46,10 @@ public class PlayerController2d : MonoBehaviour
 
         isGrounded = Physics2D.OverlapCircle(groundPoint.position, radius, groundMask);
 
+        /*for (int i = 0; i < 1000000f; i++)
+        {
+            float j = Mathf.Exp(10000f);
+        }*/
 
         //horizontal movement flip, recognizes what direction the player
         //is inputting and scales the sprite to face either left or right
@@ -72,42 +74,29 @@ public class PlayerController2d : MonoBehaviour
         else if (Input.GetKeyDown(KeyCode.Space) && isGrounded == false && dashUsed == false)
         {
             dashUsed = true;
-            rb2D.isKinematic = true;
-            rb2D.isKinematic = false;
+            dashStallTime = 0.2f;
             rb2D.gravityScale = 0;
+
+            rb2D.velocity = Vector2.zero;
             Vector2 fwd = new Vector2(faceRight, 0);
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, fwd, dashDistance, breakableMask);
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, fwd, dashDistance + 0.5f, breakableMask);
             hits = hit;
             Debug.DrawRay(transform.position, fwd, Color.green, 60f);
             if (hit)
             {
                 dashUsed = false;
                 hit.transform.gameObject.SetActive(false);
+                float moveDist = Mathf.Sign(Input.GetAxis("Horizontal")) * Mathf.Min(hit.distance - 0.5f, Mathf.Abs(Input.GetAxisRaw("Horizontal") * dashDistance));
+                rb2D.MovePosition(rb2D.position + new Vector2(moveDist, 0));
             }
-            rb2D.AddForce(new Vector2(Input.GetAxisRaw("Horizontal") * dashForceHorizontal, 0));
+            else
+                rb2D.MovePosition(rb2D.position + new Vector2(Input.GetAxisRaw("Horizontal") * dashDistance, 0));
         }
-        else if (dashUsed == false && hits)
-        {
-            dashFallTime -= Time.deltaTime;
-            if (dashFallTime < 0)
-            {
-                rb2D.gravityScale = defaultGravity;
-                dashFallTime = 0.2f;
-            }
-        }
-   
 
-
-        if (dashUsed == true)
-        {
-            dashStallTime -= Time.deltaTime;
-        }
-        if (dashStallTime < 0)
-        {
+        if (dashStallTime < 0f)
             rb2D.gravityScale = defaultGravity;
-            dashStallTime = 0.2f;
-        }
-
+        else
+            dashStallTime -= Time.deltaTime;
 
         //reenables double jump after coming in contact with the ground
         if (isGrounded)
