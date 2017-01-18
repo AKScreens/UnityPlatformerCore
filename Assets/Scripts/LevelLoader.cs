@@ -12,15 +12,22 @@ public class LevelLoader : MonoBehaviour {
 	void Start () {
         playerInZone = false;
         particleManager = FindObjectOfType<ParticleSysManagement>();
-	}
+        PlayerPrefs.SetInt("Stage", SceneManager.GetActiveScene().buildIndex);
+    }
 	
 	// Update is called once per frame
 	void Update () {
 	    if(Input.GetKeyDown(KeyCode.E) && playerInZone == true)
         {
+            if (SceneManager.GetSceneByName(levelToLoad).Equals(SceneManager.GetSceneByBuildIndex(0)))
+                PlayerPrefs.SetInt("Stage", 1);
             SceneManager.LoadSceneAsync(levelToLoad);
         }
-	}
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+            SceneManager.LoadScene(0);
+
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
